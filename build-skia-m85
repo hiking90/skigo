@@ -4,12 +4,12 @@ ROOT_DIR=$PWD
 SKIA_OUT="${ROOT_DIR}/out"
 
 PREBUILT_DIR="${ROOT_DIR}/prebuilt"
-BUILD_ARGS='cc="clang" cxx="clang++" is_debug=false is_official_build=true skia_use_system_libjpeg_turbo=false skia_use_system_libwebp=false skia_use_system_libpng=false skia_use_system_harfbuzz=false skia_use_system_expat=false extra_cflags_cc=["-frtti"]'
+BUILD_ARGS='cc="clang" cxx="clang++" is_debug=false is_official_build=true skia_use_system_libjpeg_turbo=false skia_use_system_libwebp=false skia_use_system_libpng=false skia_use_system_harfbuzz=false skia_use_system_expat=false'
 
 case "$(uname -s)" in
     Linux*)
         PREBUILT_DIR="${PREBUILT_DIR}/linux.amd64"
-        BUILD_ARGS="${BUILD_ARGS} skia_use_system_icu=true"
+        BUILD_ARGS="${BUILD_ARGS} skia_use_system_icu=true  extra_cflags_cc=[\"-frtti\"]"
         ;;
     Darwin*)
         PREBUILT_DIR="${PREBUILT_DIR}/darwin.amd64"
