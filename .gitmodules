@@ -1,4 +1,0 @@
-[submodule "skia.m85"]
-	path = skia.m85
-	url = https://github.com/google/skia
-	branch = chrome/m85
