@@ -4,11 +4,21 @@ ROOT_DIR=$PWD
 SKIA_OUT="${ROOT_DIR}/out"
 
 PREBUILT_DIR="${ROOT_DIR}/prebuilt"
+BUILD_ARGS='cc="clang" cxx="clang++" is_debug=false is_official_build=true skia_use_system_libjpeg_turbo=false skia_use_system_libwebp=false skia_use_system_libpng=false skia_use_system_harfbuzz=false skia_use_system_expat=false extra_cflags_cc=["-frtti"]'
 
 case "$(uname -s)" in
-    Linux*) PREBUILT_DIR="${PREBUILT_DIR}/linux.amd64";;
-    Darwin*) PREBUILT_DIR="${PREBUILT_DIR}/darwin.amd64";;
-    *) echo "Unknown OS" && exit 1;;
+    Linux*)
+        PREBUILT_DIR="${PREBUILT_DIR}/linux.amd64"
+        BUILD_ARGS="${BUILD_ARGS} skia_use_system_icu=true"
+        ;;
+    Darwin*)
+        PREBUILT_DIR="${PREBUILT_DIR}/darwin.amd64"
+        BUILD_ARGS="${BUILD_ARGS} skia_use_system_icu=false"
+        ;;
+    *)
+        echo "Unknown OS"
+        exit 1
+        ;;
 esac
 
 if [ ! -d "$SKIA_OUT" ]; then
@@ -29,7 +39,7 @@ fi
 cd skia
 
 python2 tools/git-sync-deps
-bin/gn gen out --args='cc="clang" cxx="clang++" is_debug=false is_official_build=true skia_use_system_icu=false skia_use_system_libjpeg_turbo=false skia_use_system_libwebp=false skia_use_system_libpng=false skia_use_system_harfbuzz=false skia_use_system_expat=false extra_cflags_cc=["-frtti"]'
+bin/gn gen out --args="${BUILD_ARGS}"
 ninja -C out skia
 
 cp out/libskia.a out/libpng.a $PREBUILT_DIR
