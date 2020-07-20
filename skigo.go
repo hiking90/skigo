@@ -2,7 +2,7 @@ package skigo
 
 /*
 #cgo darwin,!ios LDFLAGS: -Lprebuilt/darwin.amd64 -lpng -lskia -lz -framework Cocoa -framework Foundation -framework CoreGraphics
-#cgo linux,!android LDFLAGS: -lpng -lskia -lz -lfreetype -lfontconfig -lm -ldl
+#cgo linux,!android LDFLAGS: -Lprebuilt/linux.amd64 -lpng -lskia -lz -lfreetype -lfontconfig -lGL -lX11 -lm -ldl
 #cgo CXXFLAGS: -std=c++17 -Iskia.m85
 #cgo CFLAGS: -Iskia.m85
 */
