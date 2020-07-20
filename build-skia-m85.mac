@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+ROOT_DIR=$PWD
+SKIA_DIR="${ROOT_DIR}/skia.m85"
+SKIA_OUT="${ROOT_DIR}/out"
+
+if [ ! -d "$SKIA_OUT" ]; then
+    mkdir $SKIA_OUT
+fi
+
+cd $SKIA_OUT
+
+if [ ! -d "depot_tools" ]; then
+    git clone --depth 1 'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
+fi
+export PATH="$PWD/depot_tools:$PATH"
+
+cd $SKIA_DIR
+
+python2 tools/git-sync-deps
+bin/gn gen $SKIA_OUT/skia --args="is_debug=false is_official_build=true skia_use_system_icu=false skia_use_system_libjpeg_turbo=false skia_use_system_libwebp=false skia_use_system_libpng=false skia_use_system_harfbuzz=false skia_use_system_expat=false extra_cflags_cc=[\"-frtti\"]"
+ninja -C $SKIA_OUT/skia skia
+
+cp $SKIA_OUT/skia/libskia.a $SKIA_OUT/skia/libpng.a $ROOT_DIR/prebuilt/darwin.amd64
