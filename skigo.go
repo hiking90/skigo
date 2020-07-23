@@ -40,19 +40,6 @@ type TextBlob struct {
     skTextBlob *C.sk_text_blob_t
 }
 
-type Rect struct {
-    Left    float32
-    Top     float32
-    Right   float32
-    Bottom  float32
-}
-
-type IntRect struct {
-    Left    int32
-    Top     int32
-    Right   int32
-    Bottom  int32
-}
 
 type Color = uint32
 
@@ -70,6 +57,10 @@ var (
     ColorCYAN       = SetARGB(0xFF, 0x00, 0xFF, 0xFF)
     ColorMAGENTA    = SetARGB(0xFF, 0xFF, 0x00, 0xFF)
 )
+
+func NewRectFromC(rect *C.sk_rect_t) *Rect {
+    return &Rect{ float32(rect.left), float32(rect.top), float32(rect.right), float32(rect.bottom) }
+}
 
 func SetARGB(a, r, g, b uint8) Color {
     return (uint32(a) << 24) | (uint32(r) << 16) | (uint32(g) << 8) | uint32(b)
@@ -95,6 +86,16 @@ func (self *Surface) GetCanvas() *Canvas {
     return &Canvas{ skCanvas: C.sk_surface_get_canvas(self.skSurface) }
 }
 
+func (self *Canvas) ClipRect(rect *Rect) {
+    crect := &C.sk_rect_t {
+        C.float(rect.Left), C.float(rect.Top), C.float(rect.Right), C.float(rect.Bottom),
+    }
+    C.sk_canvas_clip_rect(self.skCanvas, crect)
+}
+
+func (self *Canvas) Translate(dx, dy float32) {
+    C.sk_canvas_translate(self.skCanvas, C.float(dx), C.float(dy))
+}
 
 func (self *Canvas) Scale(sx, sy float32) {
     C.sk_canvas_scale(self.skCanvas, C.float(sx), C.float(sy))
@@ -154,6 +155,31 @@ func (self *Font) SetSize(size float32) {
     C.sk_font_set_size(self.skFont, C.float(size))
 }
 
+func (self *Font) SetScaleX(scale float32) {
+    C.sk_font_set_scalex(self.skFont, C.float(scale))
+}
+
+func (self *Font) SetFace(face string) {
+    cstr := C.CString(face)
+    // C.sk_font_set_face(self.skFont, C.float(size))
+    C.free(unsafe.Pointer(cstr))
+}
+
+func (self *Font) MeasureText(text string, paint *Paint) (float32, *Rect) {
+    var rect C.sk_rect_t
+    var cpaint *C.sk_paint_t
+
+    if paint != nil {
+        cpaint = paint.skPaint
+    }
+
+    cstr := C.CString(text)
+    ret := C.sk_font_measure_text(self.skFont, cstr, C.int(len(text)), &rect, cpaint)
+    C.free(unsafe.Pointer(cstr))
+
+    return float32(ret), NewRectFromC(&rect)
+}
+
 func (self *Font) Unref() {
     C.sk_font_delete(self.skFont)
     self.skFont = nil
@@ -167,8 +193,7 @@ func NewTextBlob(str string, font *Font) *TextBlob {
 }
 
 func (self *TextBlob) Bounds() *Rect {
-    var left, right, top, bottom float32
-    C.sk_text_blob_bounds(self.skTextBlob,
-        (*C.float)(&left), (*C.float)(&top), (*C.float)(&right), (*C.float)(&bottom))
-    return &Rect{ left, top, right, bottom}
+    var rect C.sk_rect_t
+    C.sk_text_blob_bounds(self.skTextBlob, &rect)
+    return NewRectFromC(&rect)
 }

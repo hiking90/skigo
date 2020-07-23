@@ -28,11 +28,15 @@ void sk_canvas_draw_text_blob(sk_canvas_t *canvas, const sk_text_blob_t *blob, f
     sk_paint_t *paint);
 
 sk_text_blob_t * sk_text_blob_make_string(const char *text, sk_font_t *font);
-void sk_text_blob_bounds(sk_text_blob_t *, float *left, float *top, float *right, float *bottom);
+void sk_text_blob_bounds(sk_text_blob_t *, sk_rect_t *);
 
 
 sk_font_t * sk_font_new();
 void sk_font_set_size(sk_font_t *font, float size);
+void sk_font_set_scalex(sk_font_t *font, float scale);
+
+// void sk_font_set_face(sk_font_t *font, const char *face);
+float sk_font_measure_text(sk_font_t *font, const char *text, int len, sk_rect_t *bounds, sk_paint_t *paint);
 void sk_font_delete(sk_font_t *font);
 
 #ifdef __cplusplus

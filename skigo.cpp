@@ -94,12 +94,12 @@ sk_text_blob_t * sk_text_blob_make_string(const char *text, sk_font_t *font) {
     return (sk_text_blob_t *) SkTextBlob::MakeFromString(text, *AsFont(font)).release();
 }
 
-void sk_text_blob_bounds(sk_text_blob_t *blob, float *left, float *top, float *right, float *bottom) {
-    SkRect rect = AsTextBlob(blob)->bounds();
-    *left = rect.fLeft;
-    *top = rect.fTop;
-    *right = rect.fRight;
-    *bottom = rect.fBottom;
+void sk_text_blob_bounds(sk_text_blob_t *blob, sk_rect_t *rect) {
+    SkRect r = AsTextBlob(blob)->bounds();
+    rect->left = r.fLeft;
+    rect->top = r.fTop;
+    rect->right = r.fRight;
+    rect->bottom = r.fBottom;
 }
 
 
@@ -110,6 +110,15 @@ sk_font_t * sk_font_new() {
 void sk_font_set_size(sk_font_t *font, float size) {
     AsFont(font)->setSize(size);
 }
+
+void sk_font_set_scalex(sk_font_t *font, float scale) {
+    AsFont(font)->setScaleX(scale);
+}
+
+float sk_font_measure_text(sk_font_t *font, const char *text, int len, sk_rect_t *bounds, sk_paint_t *paint) {
+    return AsFont(font)->measureText(text, len, SkTextEncoding::kUTF8, (SkRect *) bounds, AsPaint(paint));
+}
+
 
 void sk_font_delete(sk_font_t *font) {
     delete AsFont(font);

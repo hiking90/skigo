@@ -45,13 +45,15 @@ func TestMain(m *testing.M) {
     surface := MakeOnScreenGLSurface(context, fw, fh)
     defer surface.Unref()
 
+    ratio := float32(fw) / WIDTH
+
     canvas := surface.GetCanvas()
     canvas.Scale(1.0, 1.0)
 
     paint := NewPaint()
 
     font := NewFont()
-    font.SetSize(120)
+    font.SetSize(60 * ratio)
 
     textBlob := NewTextBlob("Hello World", font)
     textRect := textBlob.Bounds()
@@ -61,14 +63,17 @@ func TestMain(m *testing.M) {
         gl.Viewport(0, 0, int32(fw), int32(fh))
         fmt.Printf("Window Framebuffer size: %d, %d\n", fw, fh)
 
+        canvas.Save()
         canvas.Clear(ColorWHITE)
         paint.SetColor(ColorRED)
         canvas.DrawRect(&Rect{0, 0, float32(fw)/2, float32(fh)/2}, paint)
-        paint.SetColor(ColorBLACK)
 
+        paint.SetColor(ColorBLACK)
+        // canvas.Scale(2, 2)
         canvas.DrawTextBlob(textBlob,
             (float32(fw) - textRect.Right - textRect.Left)/2,
             (float32(fh) - textRect.Bottom - textRect.Top)/2, paint)
+        canvas.Restore()
 
         // canvas.DrawString("Hello", float32(fw)/2, float32(fh)/2, font, paint)
 
